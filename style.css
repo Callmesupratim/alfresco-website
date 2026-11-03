@@ -131,8 +131,14 @@ img { max-width: 100%; }
 }
 .site-header.scrolled { border-bottom-color: var(--line); box-shadow: 0 10px 30px -18px rgba(14,26,43,.25); }
 .site-header .navbar { padding: 0; }
-.site-header .navbar-brand img { height: 54px; margin: 14px 0; transition: height .4s var(--ease); }
-.site-header.scrolled .navbar-brand img { height: 46px; margin: 10px 0; }
+.brand-logo { display: block; width: auto; overflow: visible; }
+.brand-disc { fill: var(--white); stroke: #e1e6ef; stroke-width: 1.5; }
+.brand-letter { font-family: var(--head-font); font-weight: 800; font-size: 32px; }
+.brand-word { font-family: var(--head-font); font-weight: 700; font-size: 24px; fill: var(--navy); }
+.brand-gold { fill: #c8961c; }
+.brand-tag { font-family: var(--body-font); font-weight: 500; font-size: 9.5px; fill: #7a8597; }
+.site-header .navbar-brand .brand-logo { height: 56px; margin: 12px 0; transition: height .4s var(--ease), margin .4s var(--ease); }
+.site-header.scrolled .navbar-brand .brand-logo { height: 46px; margin: 9px 0; }
 .site-header .nav-link {
     font-family: var(--head-font);
     font-weight: 500;
@@ -762,8 +768,13 @@ img { max-width: 100%; }
     font-weight: 500;
     margin-bottom: 26px;
 }
-.site-footer .logo-box { background: var(--white); display: inline-block; padding: 10px 16px; margin-bottom: 22px; border-radius: 2px; }
-.site-footer .logo-box img { height: 48px; }
+.site-footer .logo-box { display: inline-block; margin-bottom: 22px; }
+.site-footer .logo-box .brand-logo { height: 52px; max-width: 100%; }
+.site-footer .brand-word { fill: var(--white); }
+.site-footer .brand-gold { fill: var(--gold); }
+.site-footer .brand-tag { fill: rgba(255,255,255,.55); }
+.site-footer .brand-disc { stroke: rgba(255,255,255,.25); }
+.site-footer .brand-navy { fill: #c9d4f2; }
 .site-footer ul { list-style: none; padding: 0; margin: 0; }
 .site-footer ul li { margin-bottom: 12px; }
 .site-footer a { color: rgba(255,255,255,.55); }
@@ -835,6 +846,9 @@ img { max-width: 100%; }
     .hero-dots { right: auto; left: 24px; }
     .hero h1 { font-size: 60px; }
 }
+@media (min-width: 992px) and (max-width: 1199px) {
+    .site-header .navbar-brand .brand-logo, .site-header.scrolled .navbar-brand .brand-logo { height: 40px; margin: 16px 0; }
+}
 @media (max-width: 991px) {
     .section { padding: 80px 0; }
     .site-header .nav-link { padding: 12px 0 !important; }
@@ -852,6 +866,7 @@ img { max-width: 100%; }
 }
 @media (max-width: 575px) {
     body { font-size: 15px; }
+    .site-header .navbar-brand .brand-logo, .site-header.scrolled .navbar-brand .brand-logo { height: 42px; }
     .top-bar .info span { display: block; margin: 0; }
     .hero { min-height: 560px; }
     .hero h1 { font-size: 40px; }
