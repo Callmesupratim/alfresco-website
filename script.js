@@ -113,34 +113,33 @@ if (lightbox) {
     });
 }
 
-// Enquiry form: sent by email through FormSubmit (https://formsubmit.co)
+// Enquiry and job application forms: sent by email through FormSubmit (https://formsubmit.co)
+// Each form lists its fields as data-label attributes and sets data-subject / data-success.
 const FORM_ENDPOINT = 'https://formsubmit.co/ajax/info@alfrescobestech.in';
-const quoteForm = document.getElementById('quoteForm');
-if (quoteForm) {
-    const status = document.getElementById('formStatus');
-    const btn = quoteForm.querySelector('button[type="submit"]');
+document.querySelectorAll('form[data-subject]').forEach(form => {
+    const status = form.querySelector('.form-status');
+    const btn = form.querySelector('button[type="submit"]');
+    const btnText = btn.textContent;
     const showStatus = (cls, html) => {
         status.className = 'form-status ' + cls;
         status.innerHTML = html;
     };
-    quoteForm.addEventListener('submit', async e => {
+    form.addEventListener('submit', async e => {
         e.preventDefault();
-        if (!quoteForm.checkValidity()) {
-            quoteForm.reportValidity();
+        if (!form.checkValidity()) {
+            form.reportValidity();
             return;
         }
-        const d = new FormData(quoteForm);
-        if (d.get('_honey')) return; // filled in only by spam bots
-        const payload = {
-            Name: d.get('name'),
-            Phone: d.get('phone'),
-            Email: d.get('email') || '-',
-            Service: d.get('service'),
-            Message: d.get('message'),
-            _subject: 'Website enquiry: ' + d.get('service') + ' (' + d.get('name') + ')',
-            _template: 'table'
-        };
-        if (d.get('email')) payload._replyto = d.get('email');
+        if (form.elements._honey && form.elements._honey.value) return; // filled in only by spam bots
+        const payload = {};
+        form.querySelectorAll('[data-label]').forEach(el => {
+            payload[el.dataset.label] = el.value.trim() || '-';
+        });
+        const name = form.elements.name ? form.elements.name.value.trim() : '';
+        const topic = form.elements.topic ? form.elements.topic.value : '';
+        payload._subject = form.dataset.subject + (topic ? ': ' + topic : '') + (name ? ' (' + name + ')' : '');
+        payload._template = 'table';
+        if (form.elements.email && form.elements.email.value) payload._replyto = form.elements.email.value;
 
         btn.disabled = true;
         btn.textContent = 'Sending...';
@@ -152,13 +151,13 @@ if (quoteForm) {
             });
             const json = await res.json().catch(() => ({}));
             if (!res.ok || String(json.success) !== 'true') throw new Error(json.message || res.statusText);
-            showStatus('ok', '<i class="fa-solid fa-circle-check me-2"></i>Thank you! Your enquiry has been sent. We will get back to you soon.');
-            quoteForm.reset();
+            showStatus('ok', '<i class="fa-solid fa-circle-check me-2"></i>' + form.dataset.success);
+            form.reset();
         } catch (err) {
             showStatus('err', '<i class="fa-solid fa-triangle-exclamation me-2"></i>Sorry, the message could not be sent. Please call us on <a href="tel:+919007302333">9007302333</a> or email <a href="mailto:info@alfrescobestech.in">info@alfrescobestech.in</a>.');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Send Enquiry';
+            btn.textContent = btnText;
         }
     });
-}
+});
