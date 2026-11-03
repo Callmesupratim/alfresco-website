@@ -113,7 +113,59 @@ if (lightbox) {
     });
 }
 
-// Enquiry and job application forms: sent by email through FormSubmit (https://formsubmit.co)
+// Job application form: a normal multipart post so FormSubmit can attach the CV file
+const careerForm = document.getElementById('careerForm');
+if (careerForm) {
+    const MAX_CV_BYTES = 5 * 1024 * 1024;
+    const fileInput = careerForm.querySelector('input[type="file"]');
+    const fileName = careerForm.querySelector('.file-name');
+    const drop = careerForm.querySelector('.file-drop');
+    const status = careerForm.querySelector('.form-status');
+    const showError = msg => {
+        status.className = 'form-status err';
+        status.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i>' + msg;
+    };
+    fileInput.addEventListener('change', () => {
+        const f = fileInput.files[0];
+        drop.classList.toggle('has-file', !!f);
+        fileName.textContent = f ? f.name + ' (' + (f.size / 1048576).toFixed(1) + ' MB)' : 'Upload your CV';
+        status.className = 'form-status';
+        status.innerHTML = '';
+    });
+    careerForm.addEventListener('submit', e => {
+        if (!careerForm.checkValidity()) {
+            e.preventDefault();
+            careerForm.reportValidity();
+            return;
+        }
+        const f = fileInput.files[0];
+        const link = careerForm.elements['CV Link'].value.trim();
+        if (!f && !link) {
+            e.preventDefault();
+            return showError('Please upload your CV or paste a link to it.');
+        }
+        if (f && !/\.(pdf|docx?)$/i.test(f.name)) {
+            e.preventDefault();
+            return showError('Please upload your CV as a PDF or Word file.');
+        }
+        if (f && f.size > MAX_CV_BYTES) {
+            e.preventDefault();
+            return showError('Your file is larger than 5 MB. Please upload a smaller file or paste a link to your CV instead.');
+        }
+        if (careerForm.elements._honey.value) {
+            e.preventDefault();
+            return; // filled in only by spam bots
+        }
+        const name = careerForm.elements.Name.value.trim();
+        careerForm.elements._subject.value = 'Job application: ' + careerForm.elements.Position.value + ' (' + name + ')';
+        careerForm.elements._next.value = location.origin + '/thank-you.html';
+        const btn = careerForm.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Uploading...';
+    });
+}
+
+// Enquiry form: sent by email through FormSubmit (https://formsubmit.co)
 // Each form lists its fields as data-label attributes and sets data-subject / data-success.
 const FORM_ENDPOINT = 'https://formsubmit.co/ajax/info@alfrescobestech.in';
 document.querySelectorAll('form[data-subject]').forEach(form => {
